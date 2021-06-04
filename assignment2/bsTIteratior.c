@@ -103,7 +103,7 @@ char		**split(char const *s, char c)
 	return (str);
 }
 
-char		*gnl_join(char *line, char buff)
+char		*join(char *line, char buff)
 {
 	char	*ret;
 	int		size;
@@ -136,7 +136,7 @@ int			get_input(char **line)
 	{
 		if (buff[0] == '\n')
 			break;
-		*line = gnl_join(*line, buff[0]);
+		*line = join(*line, buff[0]);
 	}
 	free(buff);
 	buff = NULL;
