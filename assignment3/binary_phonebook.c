@@ -45,7 +45,7 @@ int						make_number_or_error(char *line)
 			return (ERROR);
 		idx++;
 	}
-	if (ret < 1 || ret > 5)
+	if (ret < 1 || ret > 8)
 		return (ERROR);
 	return (ret);
 }
@@ -95,10 +95,142 @@ int						get_input(char **line)
 	return (flag);
 }
 
+
+/*
+**				7. Delete All
+*/
+
+void			delete_all(t_tree_node **root)
+{
+	t_tree_node *p;
+	t_tree_node *succ;
+	t_tree_node *succ_parent;
+	t_tree_node *child;
+
+	system("clear");
+	printf("\nDelete All Node...\n");
+	while (*root != NULL)
+	{
+		p = *root;
+		succ_parent = p;
+		// 단말 노드 삭제
+		if ((p->left == NULL) && (p->right == NULL))
+		{
+			*root = NULL;
+		}
+		// 자식 노드가 한 개인 노드의 삭제
+		else if ((p->left == NULL) || (p->right == NULL))
+		{
+			if (p->left != NULL)
+				child = p->left;
+			else
+				child = p->right;
+			*root = child;
+		}
+		// 자식 노드가 두 개인 노드의 삭제
+		else
+		{
+			succ_parent = p;
+			succ = p->right;
+			while (succ->left != NULL)
+			{
+				succ_parent = succ;
+				succ = succ->left;
+			}
+			if (succ_parent->left == succ)
+				succ_parent->left = succ->right;
+			else
+				succ_parent->right = succ->right;
+			p->element = succ->element;
+			p = succ;
+		}
+	}
+	printf("\nDone!\n");
+	printf("\n(press Enter to continue)\n");
+	system ("read");
+}
+
+/*
+**				6. Print Node Size
+*/
+int				count;
+
+int				count_node_using_bst(t_tree_node *root)
+{
+	while (root)
+	{
+		count += count_node_using_bst(root->left);
+		count += count_node_using_bst(root->right);
+		return (1);
+	}
+	return (0);
+}
+
+void			print_node_size(t_tree_node *root)
+{
+	count = 0;
+	if (root)
+		count = 1;
+	system("clear");
+	count_node_using_bst(root);
+	printf("\nNumber of Nodes is [%d]\n\n", count);
+	printf("(press Enter to continue)\n");
+	system("read");
+}
+
+/*
+**				5. Print Height
+*/
+
+// void			get_height(t_tree_node* node, int height)
+// {
+
+// 	if (node == NULL)
+// 		return ;
+// 	if (count < height)
+// 		count = height;
+// 	if (node->left != NULL)
+// 	{
+// 		get_height(node->left, height + 1);
+// 	}
+// 	if (node->right != NULL)
+// 	{
+// 		get_height(node->right, height + 1);
+// 	}
+// }
+
+int				get_height(t_tree_node *node)
+{
+	int			left_height;
+	int			right_height;
+
+	if (!node)
+		return (0);
+	else
+	{
+		left_height = get_height(node->left);
+		right_height = get_height(node->right);
+		if (left_height > right_height)
+			return (1 + left_height);
+		else
+			return (1 + right_height);
+	}
+}
+
+void			print_height(t_tree_node *root)
+{
+	int			count;
+
+	count = 0;
+	count = get_height(root);
+	printf("\n[%d]\n", count);
+	system("read");
+}
+
+
 /*
 **				4. Print
 */
-
 void			print_all_word(t_tree_node *root)
 {
 	if (root)
@@ -154,12 +286,14 @@ void			search(t_tree_node *root)
 	get_input(&search_word);
 	if (!(ret = search_word_using_bst(root, search_word)))
 	{
+		free(search_word);
 		system("clear");
 		printf("The word [%s] is not in the dictionary.\n", search_word);
 		printf("(press Enter to continue)\n");
 		system("read");
 		return ;
 	}
+	free(search_word);
 	printf("word [%s] meaning : %s\n\n", ret->word, ret->mean);
 	printf("(press Enter to continue)\n");
 	system("read");
@@ -168,6 +302,78 @@ void			search(t_tree_node *root)
 /*
 **				2. Delete
 */
+
+void			delete_one_node(t_tree_node **root, char *search_word)
+{
+	t_tree_node	*parent;
+	t_tree_node *p;
+	t_tree_node *succ;
+	t_tree_node	*succ_parent;
+	t_tree_node	*child;
+
+	parent = NULL;
+	p = *root;
+	while ((p != NULL) && (strcmp(p->element.word, search_word) != 0))
+	{
+		parent = p;
+		if (strcmp(search_word, p->element.word) < 0)
+			p = p->left;
+		else
+			p = p->right;
+	}
+	succ_parent = p;
+	// 단말 노드 삭제
+	if ((p->left == NULL) && (p->right == NULL))
+	{
+		if (parent != NULL)
+		{
+			if (parent->left == p)
+				parent->left = NULL;
+			else
+				parent->right = NULL;
+		}
+		else
+		{
+			*root = NULL;
+		}
+	}
+	// 자식 노드가 한 개인 노드의 삭제
+	else if ((p->left == NULL) || (p->right == NULL))
+	{
+		if (p->left != NULL)
+			child = p->left;
+		else
+			child = p->right;
+		if (parent != NULL)
+		{
+			if (parent->left == p)
+				parent->left = child;
+			else
+				parent->right = child;
+		}
+		else
+			*root = child;
+	}
+	// 자식 노드가 두 개인 노드의 삭제
+	else
+	{
+		succ_parent = p;
+		succ = p->right;
+		while (succ->left != NULL)
+		{
+			succ_parent = succ;
+			succ = succ->left;
+		}
+		if (succ_parent->left == succ)
+			succ_parent->left = succ->right;
+		else
+			succ_parent->right = succ->right;
+		p->element = succ->element;
+		p = succ;
+	}
+
+}
+
 
 t_tree_node		*search_node_using_bst(t_tree_node *root, char *search_word)
 {
@@ -188,27 +394,32 @@ t_tree_node		*search_node_using_bst(t_tree_node *root, char *search_word)
 	return (NULL);
 }
 
-void			delete(t_tree_node *root)
+void			delete(t_tree_node **root)
 {
+
 	char		*delete_word;
 	t_tree_node	*finded_element;
 
 	write(1, "[Delete] Enter word to delte\n : ", strlen("[Delete] Enter word to delte\n : "));
 	get_input(&delete_word);
-	if (!(finded_element = search_node_using_bst(root, delete_word)))
+	if (!(finded_element = search_node_using_bst(*root, delete_word)))
 	{
 		system("clear");
 		printf("The word [%s] is not in the dictionary.\n", delete_word);
 		printf("(press Enter to continue)\n");
+		free(delete_word);
 		system("read");
 		return ;
 	}
 	else
 	{
-		printf("%s\n%s\n", finded_element->element.word, finded_element->element.mean);
+		delete_one_node(root, delete_word);
+		system("clear");
+		printf("The word [%s] is deleted.\n", delete_word);
+		printf("(press Enter to continue)\n");
+		free(delete_word);
 		system("read");
 	}
-
 }
 
 
@@ -271,8 +482,10 @@ void			insert_announce(t_element *new_word)
 void			insert(t_tree_node **root)
 {
 	t_element	new_word;
+	t_tree_node	*temp;
 
 	system("clear");
+	temp = *root;
 	insert_announce(&new_word);
 	*root = insert_new_node(*root, &new_word);
 }
@@ -298,7 +511,13 @@ void					print_menu()
 	printf("*                                  *\n");
 	printf("*          (4) : Print             *\n");
 	printf("*                                  *\n");
-	printf("*          (5) : Exit              *\n");
+	printf("*          (5) : Height            *\n");
+	printf("*                                  *\n");
+	printf("*          (6) : Node size         *\n");
+	printf("*                                  *\n");
+	printf("*          (7) : Delete all        *\n");
+	printf("*                                  *\n");
+	printf("*          (8) : Exit              *\n");
 	printf("*                                  *\n");
 	printf("* -------------------------------- *\n");
 	write(1, "Enter number (1 ~ 5)  :   ", strlen("Enter number (1 ~ 5)  :   "));
@@ -329,7 +548,7 @@ int						main(void)
 	system("read");
 	system("clear");
 	input = 0;
-	while (input != 5)
+	while (input != 8)
 	{
 		input = 0;
 		print_menu();
@@ -343,11 +562,20 @@ int						main(void)
 		else if (input == 1)
 			insert(&root);
 		else if (input == 2)
-			delete(root);
+			delete(&root);
 		else if (input == 3)
 			search(root);
 		else if (input == 4)
 			print(root);
+		else if (input == 5)
+			print_height(root);
+		else if (input == 6)
+			print_node_size(root);
+		else if (input == 7)
+		{
+			delete_all(&root);
+			root = NULL;
+		}
 		free(line);
 		system("clear");
 	}
