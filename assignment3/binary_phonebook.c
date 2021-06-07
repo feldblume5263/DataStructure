@@ -182,23 +182,6 @@ void			print_node_size(t_tree_node *root)
 **				5. Print Height
 */
 
-// void			get_height(t_tree_node* node, int height)
-// {
-
-// 	if (node == NULL)
-// 		return ;
-// 	if (count < height)
-// 		count = height;
-// 	if (node->left != NULL)
-// 	{
-// 		get_height(node->left, height + 1);
-// 	}
-// 	if (node->right != NULL)
-// 	{
-// 		get_height(node->right, height + 1);
-// 	}
-// }
-
 int				get_height(t_tree_node *node)
 {
 	int			left_height;
@@ -221,9 +204,11 @@ void			print_height(t_tree_node *root)
 {
 	int			count;
 
+	system("clear");
 	count = 0;
 	count = get_height(root);
-	printf("\n[%d]\n", count);
+	printf("Height of Tree is [%d]\n\n", count);
+	printf("(press Enter to continue)\n");
 	system("read");
 }
 
@@ -286,10 +271,10 @@ void			search(t_tree_node *root)
 	get_input(&search_word);
 	if (!(ret = search_word_using_bst(root, search_word)))
 	{
-		free(search_word);
 		system("clear");
 		printf("The word [%s] is not in the dictionary.\n", search_word);
 		printf("(press Enter to continue)\n");
+		free(search_word);
 		system("read");
 		return ;
 	}
@@ -400,7 +385,8 @@ void			delete(t_tree_node **root)
 	char		*delete_word;
 	t_tree_node	*finded_element;
 
-	write(1, "[Delete] Enter word to delte\n : ", strlen("[Delete] Enter word to delte\n : "));
+	system("clear");
+	write(1, "[Delete] Enter word to delete\n : ", strlen("[Delete] Enter word to delete\n : "));
 	get_input(&delete_word);
 	if (!(finded_element = search_node_using_bst(*root, delete_word)))
 	{
@@ -482,10 +468,8 @@ void			insert_announce(t_element *new_word)
 void			insert(t_tree_node **root)
 {
 	t_element	new_word;
-	t_tree_node	*temp;
 
 	system("clear");
-	temp = *root;
 	insert_announce(&new_word);
 	*root = insert_new_node(*root, &new_word);
 }
